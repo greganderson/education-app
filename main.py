@@ -22,6 +22,12 @@ async def get_instructors(db: Session = Depends(get_db)) -> list[Instructor]:
 async def get_courses(db: Session = Depends(get_db)) -> list[Course]:
     return db.exec(select(Course)).all()
 
+@app.get("/courses/{course_id}/students")
+async def get_course_student_list(course_id: int, db: Session = Depends(get_db)) -> list[Student]:
+    statement = select(Course).where(Course.course_id == course_id)
+    course = db.exec(statement).first()
+    return course.students
+
 
 ### POST ###
 
@@ -38,4 +44,15 @@ async def create_instructor(instructor: Instructor, db: Session = Depends(get_db
 @app.post("/courses")
 async def create_course(course: Course, db: Session = Depends(get_db)) -> None:
     db.add(course)
+    db.commit()
+
+@app.post("/courses/{course_id}/students/{student_id}")
+async def add_student_to_course(course_id: int, student_id: int, db: Session = Depends(get_db)) -> None:
+    statement = select(Student).where(Student.student_id == student_id)
+    student = db.exec(statement).first()
+
+    statement = select(Course).where(Course.course_id == course_id)
+    course = db.exec(statement).first()
+
+    course.students.append(student)
     db.commit()

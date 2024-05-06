@@ -8,18 +8,18 @@ class StudentCourseLink(SQLModel, table=True):
 class Student(SQLModel, table=True):
     student_id: int | None = Field(default=None, primary_key=True)
     name: str
-    classes: list["Course"] = Relationship(back_populates="students", link_model=StudentCourseLink)
+    courses: list["Course"] = Relationship(back_populates="students", link_model=StudentCourseLink)
 
 class Instructor(SQLModel, table=True):
     instructor_id: int | None = Field(default=None, primary_key=True)
     name: str
-    classes: list["Course"] = Relationship(back_populates="instructor")
+    courses: list["Course"] = Relationship(back_populates="instructor")
 
 class Course(SQLModel, table=True):
     course_id: int | None = Field(default=None, primary_key=True)
     name: str
     semester: str
-    students: list[Student] = Relationship(back_populates="classes", link_model=StudentCourseLink)
+    students: list[Student] = Relationship(back_populates="courses", link_model=StudentCourseLink)
 
     instructor_id: int = Field(default=None, foreign_key="instructor.instructor_id")
-    instructor: Instructor = Relationship(back_populates="classes")
+    instructor: Instructor = Relationship(back_populates="courses")
